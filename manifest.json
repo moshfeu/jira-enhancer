@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Jira Link Copy",
+  "version": "1.0",
+  "description": "Injects a link into Jira issues page and copies it to the clipboard.",
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": [
+    "clipboardWrite"
+  ]
+}
