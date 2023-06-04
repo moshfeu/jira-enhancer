@@ -1,4 +1,4 @@
-console.log('hello from jira copy link');
+console.log('👋 hello from jira copy link');
 
 /**
  *
@@ -23,10 +23,10 @@ function copyToClipboard(href, text) {
   document.body.removeChild(link);
 }
 
-function createLink() {
-  const titleElem = document.querySelector('#summary-val');
+async function createLink() {
+  const titleElem = await waitForElement('#summary-val');
   if (!titleElem) {
-    console.error('Could not find title element')
+    console.error('Could not find title element');
     return;
   }
 
@@ -38,7 +38,7 @@ function createLink() {
   link.setAttribute('data-title', title);
   link.style.marginLeft = '10px';
 
-  link.addEventListener('click', event => {
+  link.addEventListener('click', (event) => {
     event.preventDefault();
     const href = event.target.href;
     const text = event.target.getAttribute('data-title');
@@ -46,7 +46,7 @@ function createLink() {
     showToast('Copied to clipboard');
   });
 
-  const issueLink = document.querySelector('a#key-val');
+  const issueLink = document.querySelector('a#key-val,#issuekey-val a');
   if (!issueLink) {
     console.error('Could not find issue link');
     return;
@@ -88,4 +88,40 @@ function showToast(message) {
   }, 3000);
 }
 
-createLink();
+function waitForElement(selector, timeout = 3000) {
+  let start = Date.now();
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      const element = document.querySelector(selector);
+      if (element) {
+        clearInterval(interval);
+        resolve(element);
+      }
+      if (Date.now() - start > timeout) {
+        clearInterval(interval);
+        reject(`could not find element with selector ${selector}`);
+      }
+    }, 100);
+  });
+}
+
+window.addEventListener('load', async () => {
+  if (document.getElementById('key-val')) {
+    createLink();
+    return;
+  }
+  // Find the element that holds the ticket view
+  const ticketViewElement = await waitForElement('#ghx-detail-view');
+
+  // Observe the ticket view element for changes
+  const observer = new MutationObserver((mutationsList) => {
+    if ([...mutationsList[0].addedNodes].some((node) => node.id === 'ghx-detail-issue')) {
+      createLink();
+    }
+  });
+  // Observe the ticket view element for changes
+  observer.observe(ticketViewElement, {
+    childList: true,
+    subtree: true,
+  });
+});
