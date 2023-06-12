@@ -5,7 +5,7 @@
   "description": "Injects a link into Jira issues page and copies it to the clipboard.",
   "content_scripts": [
     {
-      "matches": ["https://jira.wixpress.com/browse/*", "https://jira.wixpress.com/secure/RapidBoard.jspa*"],
+      "matches": ["https://jira.wixpress.com/*"],
       "js": ["content.js"]
     }
   ],

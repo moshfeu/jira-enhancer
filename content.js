@@ -105,9 +105,23 @@ function waitForElement(selector, timeout = 3000) {
   });
 }
 
-window.addEventListener('load', async () => {
+function addLinkIfIssuePage() {
   if (document.getElementById('key-val')) {
     createLink();
+    return true;
+  }
+}
+
+let url = window.location.href;
+setInterval(() => {
+  if (url !== window.location.href) {
+    url = window.location.href;
+    addLinkIfIssuePage();
+  }
+}, 1000);
+
+window.addEventListener('load', async () => {
+  if (addLinkIfIssuePage()) {
     return;
   }
   // Find the element that holds the ticket view
